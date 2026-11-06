@@ -7,3 +7,5 @@ node_modules
 dist/
 # A pack of the build (pnpm pack).
 *.tgz
+# mise run screenshots' files, when --dir names this directory; captures are never committed.
+captures/

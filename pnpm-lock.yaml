@@ -20,6 +20,12 @@ importers:
       '@iconify/utils':
         specifier: 3.1.7
         version: 3.1.7
+      '@jaimestill/spike-html-apps-foundation':
+        specifier: github:JaimeStill/spike-html-apps-foundation#v0.3.0
+        version: https://codeload.github.com/JaimeStill/spike-html-apps-foundation/tar.gz/ff723d1597cab408fe81d7e35ab52bfa33cd9c55
+      '@jaimestill/spike-html-apps-tooling':
+        specifier: github:JaimeStill/spike-html-apps-tooling#v0.3.0
+        version: https://codeload.github.com/JaimeStill/spike-html-apps-tooling/tar.gz/d1687ef64e24bb5853987f5c5a314bbbfc814072
       '@types/node':
         specifier: 26.6.6
         version: 26.6.6
@@ -129,6 +135,15 @@ packages:
 
   '@iconify/utils@3.1.7':
     resolution: {integrity: sha512-JZHlwdID+dy+lTgbYC8NEC4zeugqeYsc6jewvzb4c58kHauJn+X7rNwQjxz5p2qSjqaEeQoLkCIQ9v/H4PK0/w==}
+
+  '@jaimestill/spike-html-apps-foundation@https://codeload.github.com/JaimeStill/spike-html-apps-foundation/tar.gz/ff723d1597cab408fe81d7e35ab52bfa33cd9c55':
+    resolution: {gitHosted: true, integrity: sha512-bGAtgg4E8Dqi4takgffAWSoUKiRMa8UTZuPy3yy2ZCWcbd8GlU+rhdXM1FwUNe5dPDTqPsbfTHcKxYdP9UjKZA==, tarball: https://codeload.github.com/JaimeStill/spike-html-apps-foundation/tar.gz/ff723d1597cab408fe81d7e35ab52bfa33cd9c55}
+    version: 0.3.0
+
+  '@jaimestill/spike-html-apps-tooling@https://codeload.github.com/JaimeStill/spike-html-apps-tooling/tar.gz/d1687ef64e24bb5853987f5c5a314bbbfc814072':
+    resolution: {gitHosted: true, integrity: sha512-uQYlMLWnhEQ14v3q7XACnDfYKYH4TcXkY3yoXL8jSPG/a6xGpE8Ib9hwcVzyOumXMgCBGFdQh4F/HlzoZZ9zFQ==, tarball: https://codeload.github.com/JaimeStill/spike-html-apps-tooling/tar.gz/d1687ef64e24bb5853987f5c5a314bbbfc814072}
+    version: 0.3.0
+    hasBin: true
 
   '@keyv/bigmap@1.3.1':
     resolution: {integrity: sha512-WbzE9sdmQtKy8vrNPa9BRnwZh5UF4s1KTmSK0KUVLo3eff5BlQNNWDnFOouNpKfPKDnms9xynJjsMYjMaT/aFQ==}
@@ -725,6 +740,10 @@ snapshots:
       '@antfu/install-pkg': 2.1.0
       '@iconify/types': 2.0.0
       import-meta-resolve: 4.2.0
+
+  '@jaimestill/spike-html-apps-foundation@https://codeload.github.com/JaimeStill/spike-html-apps-foundation/tar.gz/ff723d1597cab408fe81d7e35ab52bfa33cd9c55': {}
+
+  '@jaimestill/spike-html-apps-tooling@https://codeload.github.com/JaimeStill/spike-html-apps-tooling/tar.gz/d1687ef64e24bb5853987f5c5a314bbbfc814072': {}
 
   '@keyv/bigmap@1.3.1(keyv@5.6.0)':
     dependencies:

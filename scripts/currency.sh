@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-# Prints `<where>: <item> <pin> -> <latest>` for each mise tool, package.json dependency, and GitHub
-# Actions pin behind its latest, and exits 1 if any; prints nothing when all are current. Reads
-# the network.
-# An action pin, <owner>/<repo>[/path]@vX.Y.Z, is compared against the repository's highest vX.Y.Z
-# tag in `git ls-remote --tags`, which needs no GitHub token. It trails only when that tag is
-# strictly higher; an action pin in any other form is reported as one this script can't compare.
-# Adapted from spike-html-hosting-components (99824f7): scripts/currency.sh, without its github:
-# devDependencies and the peer range, as the layer has neither.
+# Prints `<where>: <item> <pin> -> <latest>` for each mise tool, package.json dependency, GitHub
+# Actions pin, and github: devDependency's tag behind its latest, and exits 1 if any; prints
+# nothing when all are current. Reads the network.
+# An action pin, <owner>/<repo>[/path]@vX.Y.Z, and a github: devDependency's tag are compared
+# against the repository's highest vX.Y.Z tag in `git ls-remote --tags`, which needs no GitHub
+# token. Each trails only when that tag is strictly higher; an action pin in any other form is
+# reported as one this script can't compare.
+# Adapted from spike-html-hosting-components (99824f7): scripts/currency.sh, without the peer
+# range, as the layer has no peer.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -45,6 +46,16 @@ pins=$(node -p '
 ')
 typescript_eslint=$(node -p 'require("./package.json").devDependencies["typescript-eslint"]')
 while read -r package pin; do
+  # A github: devDependency (the foundation, the tooling) is pinned to its repository's release
+  # tag, which the registry doesn't hold: its tag against that repository's highest tag.
+  if [[ $pin == github:* ]]; then
+    spec=${pin#github:}
+    latest_tag "${spec%%#*}"
+    if [[ -n "$latest" ]] && behind "${spec#*#}" "$latest"; then
+      trailing+=$'\n'"package.json: $package ${spec#*#} -> $latest"
+    fi
+    continue
+  fi
   latest=$(pnpm view "$package" version)
   # typescript is held to the newest version typescript-eslint's peer range accepts.
   if [[ $package == typescript ]]; then

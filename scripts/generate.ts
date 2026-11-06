@@ -56,7 +56,7 @@ export interface SetSource {
 
 /** One entry of sets.json: the @iconify-json package a released set is read from, and its
  * upstream LICENSE, its path in the repository, its sha256, and where it was fetched from. */
-interface ReleasedSet {
+export interface ReleasedSet {
   package: string;
   license: {
     path: string;

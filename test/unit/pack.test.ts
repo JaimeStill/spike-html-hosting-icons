@@ -1,8 +1,8 @@
 // The pack: pnpm pack's tarball of the build, extracted into a scratch consumer's node_modules in
-// TMPDIR, removed after. Its files are the build and the files every pack carries; its manifest
-// declares no runtime dependency; and an icon resolves from it by its set and name, as a consumer
-// imports it, in node to its module and under TypeScript's types condition to its declaration,
-// which types the icon as a string. It packs the dist/ mise run build writes, and reads no network.
+// TMPDIR, removed after. Its files are the build and the files every pack carries, never the browse
+// page or the scripts that serve it; its manifest declares no runtime dependency; and an icon
+// resolves from it by its set and name, as a consumer imports it, in node to its module and under
+// TypeScript's types condition to its declaration, which types the icon as a string. It packs the dist/ mise run build writes, and reads no network.
 
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -98,6 +98,11 @@ describe("the pack", () => {
       listFiles(installed),
       [...built, "LICENSE", "README.md", "package.json"].sort(),
     );
+  });
+
+  test("leaves out the browse page and what serves it", () => {
+    const stray = listFiles(installed).filter((path) => /^(browse|scripts|test)\//.test(path));
+    assert.deepEqual(stray, []);
   });
 
   test("ships Octicons' LICENSE and its provenance line beside the modules", () => {

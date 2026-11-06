@@ -1,0 +1,136 @@
+<!doctype html>
+<!-- The browse page, dev-only and never packed: every glyph of every released set, grouped by set,
+     each set headed by its title, its prefix, its licence, and its upstream, and each glyph shown
+     beside its name in a grid that wraps to the width, so it never scrolls sideways. It is the
+     layer's capture fixture, which mise run screenshots captures and the browser tier checks, and
+     mise run browse serves it for a reader. scripts/served.ts serves it at /browse/: the
+     catalog, /browse/catalog.js, made from sets.json and dist/, and each glyph the built module
+     /dist/<set>/<icon>.js, imported as a consumer imports it, its default export the markup.
+     The page loads the foundation as the sites load it: page-full.css, then register-full.js,
+     preferences.js, and keys.js render-blocking, so every built-in profile is registered and the
+     stored theme applies before first paint; sl-theme-menu opens on the Theme button or T. The
+     query's palette, space, type, and scheme set the root's data-palette, data-space, data-type,
+     and data-scheme before the modules run, which a stored theme replaces.
+     window.errors collects every error and unhandled rejection the page raises; window.ready
+     settles once every glyph is in the page. The foundation's bare specifiers map onto /deps/,
+     where the server answers with the installed package's dist/, as its exports do.
+     Adapted from spike-html-hosting-components (aa9d491):
+     test/fixtures/sites/spike-html-hosting-architecture/index.html, its error log, its profile
+     query, its foundation entries, and its Theme button. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>spike-html-hosting-icons: browse</title>
+    <script>
+      window.errors = [];
+      window.addEventListener("error", (event) => window.errors.push(String(event.message)));
+      window.addEventListener("unhandledrejection", (event) =>
+        window.errors.push(String(event.reason)),
+      );
+      {
+        const query = new URLSearchParams(location.search);
+        const attributes = { palette: "data-palette", space: "data-space", type: "data-type", scheme: "data-scheme" };
+        for (const [key, attribute] of Object.entries(attributes)) {
+          const value = query.get(key);
+          if (value !== null) document.documentElement.setAttribute(attribute, value);
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="/deps/@jaimestill/spike-html-apps-foundation/dist/page-full.css" />
+    <style>
+      /* The page's layout: the header's title and Theme button in a row, then each set's section,
+         its glyphs in a grid of cells at least 6rem wide, three to a row at 390px, as many as the width holds, and never
+         wider than the page. A glyph is drawn at 2rem in the text's color, which its markup's
+         currentColor follows; a name is set small, breaks at its hyphens, and within a word only
+         rather than widen its cell. */
+      body {
+        display: grid;
+        align-content: start;
+        gap: var(--space-l);
+        padding: var(--space-m);
+      }
+      body > header {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-s);
+      }
+      main,
+      section {
+        display: grid;
+        gap: var(--space-m);
+      }
+      h1,
+      h2,
+      p {
+        margin: 0;
+      }
+      .about {
+        display: grid;
+        grid-template-columns: max-content minmax(0, 1fr);
+        gap: var(--space-xs) var(--space-s);
+        margin: 0;
+      }
+      .about :is(dt, dd) {
+        margin: 0;
+      }
+      .about dd {
+        overflow-wrap: anywhere;
+      }
+      .glyphs {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 6rem), 1fr));
+        gap: var(--space-xs);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .glyphs li {
+        display: grid;
+        justify-items: center;
+        align-content: start;
+        gap: var(--space-xs);
+        margin: 0;
+        padding: var(--space-xs);
+        border: 1px solid var(--border);
+        text-align: center;
+      }
+      .glyph {
+        display: flex;
+        font-size: 2rem;
+      }
+      .glyphs code {
+        font-size: 0.75rem;
+        overflow-wrap: break-word;
+        min-inline-size: 0;
+        max-inline-size: 100%;
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "@jaimestill/spike-html-apps-foundation/": "/deps/@jaimestill/spike-html-apps-foundation/dist/"
+        }
+      }
+    </script>
+    <script type="module" blocking="render" src="/deps/@jaimestill/spike-html-apps-foundation/dist/register-full.js"></script>
+    <script type="module" blocking="render" src="/deps/@jaimestill/spike-html-apps-foundation/dist/preferences.js"></script>
+    <script type="module" blocking="render" src="/deps/@jaimestill/spike-html-apps-foundation/dist/keys.js"></script>
+    <script type="module" src="./browse.js"></script>
+  </head>
+  <body>
+    <header>
+      <h1>spike-html-hosting-icons</h1>
+      <button type="button" commandfor="theme" command="--open" data-keys="t">Theme</button>
+    </header>
+    <main>
+      <p>
+        Every glyph of every released set, by its name, as
+        <code>@jaimestill/spike-html-hosting-icons/&lt;set&gt;/&lt;name&gt;</code> imports it.
+      </p>
+    </main>
+    <sl-theme-menu id="theme"></sl-theme-menu>
+  </body>
+</html>
