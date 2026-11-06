@@ -1,0 +1,11 @@
+{
+  "name": "Tiny",
+  "total": 3,
+  "author": {
+    "name": "spike-html-hosting-icons"
+  },
+  "license": {
+    "title": "MIT",
+    "spdx": "MIT"
+  }
+}

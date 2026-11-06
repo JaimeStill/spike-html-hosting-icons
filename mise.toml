@@ -1,6 +1,6 @@
-# Adapted from spike-html-hosting-components (ac754f1): mise.toml, its toolchain, lint, and type
-# check, without the build, the unit and browser tiers, the screenshots, and chrome-headless-shell,
-# which the layer gains with its generator and its browse page.
+# Adapted from spike-html-hosting-components (ac754f1): mise.toml, its toolchain, lint, type check,
+# build, and unit tier, without the browser tier, the screenshots, and chrome-headless-shell, which
+# the layer gains with its browse page.
 # Tasks never install a missing tool; mise run install is the one task that reads the network.
 [settings]
 task.run_auto_install = false
@@ -46,9 +46,20 @@ description = "Type-check the repository's JavaScript and TypeScript with tsc, n
 depends = ["preflight"]
 run = "tsc -p ."
 
+# The generator runs as TypeScript under Node's type stripping, on the installed @iconify-json sets.
+[tasks.build]
+description = "Generate the released icon sets, sets.json's, into a fresh dist/"
+depends = ["preflight"]
+run = "node scripts/build.ts"
+
+[tasks."test:unit"]
+description = "Run the unit tier on the generator, its fixture sets, a pack of the build, and a fixture build"
+depends = ["preflight", "build"]
+run = "node --test 'test/unit/*.test.ts'"
+
 [tasks.check]
-description = "Run every check; reads no network"
-depends = ["lint", "types"]
+description = "Run every check; reads no network; writes dist/"
+depends = ["lint", "types", "build", "test:unit"]
 
 [tasks.install]
 description = "Install the pins and node_modules; reads the network"
