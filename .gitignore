@@ -2,3 +2,10 @@
 .claude/plans/
 .claude/briefs/
 node_modules
+
+# The build (mise run build, and the check's): only a release tag's tree carries it.
+dist/
+# A pack of the build (pnpm pack).
+*.tgz
+# mise run screenshots' files, when --dir names this directory; captures are never committed.
+captures/

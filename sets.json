@@ -1,0 +1,12 @@
+{
+  "octicon": {
+    "package": "@iconify-json/octicon",
+    "license": {
+      "path": "licenses/octicon/LICENSE",
+      "sha256": "da259c8bd0de62713ccdcf88910aebca810644f98c2c912bad814fc79ea778df",
+      "repository": "https://github.com/primer/octicons",
+      "commit": "9a274e212ee25c400ff666ce25a57866b7eacc25",
+      "tag": "@primer/octicons@19.42.0"
+    }
+  }
+}

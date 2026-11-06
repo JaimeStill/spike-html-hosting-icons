@@ -1,0 +1,23 @@
+// The type check (mise run types), never emitting: the repository's own JavaScript and the
+// TypeScript of its scripts and tests, run as TypeScript by node under Node's type stripping, on
+// node's module resolution and its types. eslint.config.js is checked as JavaScript (checkJs).
+// Adapted from spike-html-hosting-components (99824f7): tsconfig.json and tsconfig.test.json, one
+// file, as nothing here is emitted by tsc.
+{
+  "compilerOptions": {
+    "target": "es2024",
+    "lib": ["es2024"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "types": ["node"],
+    "strict": true,
+    "erasableSyntaxOnly": true,
+    "verbatimModuleSyntax": true,
+    "allowImportingTsExtensions": true,
+    "allowJs": true,
+    "checkJs": true,
+    "noEmit": true,
+    "skipLibCheck": false
+  },
+  "include": ["*.js", "scripts/**/*.ts", "test/**/*.ts"]
+}
