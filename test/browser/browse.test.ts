@@ -5,7 +5,8 @@
 // each glyph is its module's default export as markup, an svg hidden from assistive technology and
 // out of the tab order, drawn in currentColor, so its paint follows the text's color; the page
 // renders in every profile the foundation's full entry registers, light and dark, at 1280 and 390
-// px, with no sideways scroll, the glyphs' paint the text's in each and the schemes' backgrounds
+// px, with no sideways scroll, each glyph's name broken only after a hyphen and never wider than
+// its cell, the glyphs' paint the text's in each and the schemes' backgrounds
 // apart; a dark scheme the query names reaches the first load's glyphs; the page raises no error;
 // and no request the page makes leaves the local origin.
 // Adapted from spike-html-hosting-components (aa9d491): test/browser/site.test.ts, its server,
@@ -85,6 +86,31 @@ const modules: Record<string, string> = Object.fromEntries(
 
 /** The glyphs, in a page expression: each list item of a set's section. */
 const ITEMS = `[...document.querySelectorAll("section .glyphs > li")]`;
+
+/**
+ * Each name broken within a word, or wider than its box, in a page expression: a run of a name's
+ * text up to and including its next hyphen whose characters lie on more than one line, or a name
+ * element that scrolls. A name may break only after a hyphen, so each such run sits on one line,
+ * and its longest word fits its cell.
+ */
+const BROKEN = `${ITEMS}.flatMap((item) => {
+  const name = item.querySelector(":scope > code");
+  const found = [];
+  if (name.scrollWidth > name.clientWidth) {
+    found.push(item.dataset.icon + " is wider than its box by " + (name.scrollWidth - name.clientWidth) + "px");
+  }
+  const walker = document.createTreeWalker(name, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+  for (let text = walker.nextNode(); text !== null; text = walker.nextNode()) {
+    for (const match of text.data.matchAll(/[^-]+-?|-/g)) {
+      range.setStart(text, match.index);
+      range.setEnd(text, match.index + match[0].length);
+      const lines = new Set([...range.getClientRects()].map(({ top }) => Math.round(top)));
+      if (lines.size > 1) found.push(item.dataset.icon + " breaks within " + JSON.stringify(match[0]));
+    }
+  }
+  return found;
+})`;
 
 /**
  * Each glyph whose paint isn't the text's, in a page expression: an element of the glyph's svg
@@ -192,7 +218,7 @@ describe("the browse page", { timeout: 300_000 }, () => {
     assert.deepEqual(problems, []);
   });
 
-  test("renders in every profile, light and dark, at 1280 and 390 px, with no sideways scroll, the glyphs in the text's color", async () => {
+  test("renders in every profile, light and dark, at 1280 and 390 px, with no sideways scroll, no name broken within a word, the glyphs in the text's color", async () => {
     await load();
     const registry: Registry = await page.evaluate(`(() => {
       const store = globalThis[Symbol.for("spike-html-apps-foundation.registry")];
@@ -203,8 +229,12 @@ describe("the browse page", { timeout: 300_000 }, () => {
     for (const run of runs(registry)) {
       const label = `${run.palette} ${run.space} ${run.type} ${run.scheme} at ${run.width}px`;
       await resize(page, run.width);
-      const shown: { overflow: number; unfollowed: string[]; background: string } =
-        await page.evaluate(`(async () => {
+      const shown: {
+        overflow: number;
+        broken: string[];
+        unfollowed: string[];
+        background: string;
+      } = await page.evaluate(`(async () => {
           const root = document.documentElement;
           root.dataset.palette = ${JSON.stringify(run.palette)};
           root.dataset.space = ${JSON.stringify(run.space)};
@@ -213,11 +243,13 @@ describe("the browse page", { timeout: 300_000 }, () => {
           await ${SETTLED};
           return {
             overflow: root.scrollWidth - root.clientWidth,
+            broken: ${BROKEN},
             unfollowed: ${UNFOLLOWED},
             background: getComputedStyle(document.body).backgroundColor,
           };
         })()`);
       assert.ok(shown.overflow <= 0, `${label}: scrolls sideways by ${shown.overflow}px`);
+      assert.deepEqual(shown.broken, [], label);
       assert.deepEqual(shown.unfollowed, [], label);
       backgrounds.set(`${run.palette} ${run.space} ${run.type} ${run.scheme}`, shown.background);
     }

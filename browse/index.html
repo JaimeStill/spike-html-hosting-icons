@@ -40,10 +40,13 @@
     <link rel="stylesheet" href="/deps/@jaimestill/spike-html-apps-foundation/dist/page-full.css" />
     <style>
       /* The page's layout: the header's title and Theme button in a row, then each set's section,
-         its glyphs in a grid of cells at least 6rem wide, three to a row at 390px, as many as the width holds, and never
+         its glyphs in a grid of cells as many as the width holds, two to a row at 390px, and never
          wider than the page. A glyph is drawn at 2rem in the text's color, which its markup's
-         currentColor follows; a name is set small, breaks at its hyphens, and within a word only
-         rather than widen its cell. */
+         currentColor follows; a name is set small and breaks only at the <wbr> browse.js puts
+         after each of its hyphens, never within a word. So a cell's minimum is its padding and
+         6.5rem of name: the longest word with its hyphen, "accessibility-", is 14 characters of
+         monospace at 0.75rem, about 6.2rem, and the cell's border is 2px. Three cells to a row at
+         390px would leave each name less than 5rem, so the minimum gives up the third. */
       body {
         display: grid;
         align-content: start;
@@ -81,7 +84,7 @@
       }
       .glyphs {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(min(100%, 6rem), 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, calc(6.5rem + 2 * var(--space-xs))), 1fr));
         gap: var(--space-xs);
         margin: 0;
         padding: 0;
@@ -103,7 +106,8 @@
       }
       .glyphs code {
         font-size: 0.75rem;
-        overflow-wrap: break-word;
+        overflow-wrap: normal;
+        word-break: normal;
         min-inline-size: 0;
         max-inline-size: 100%;
       }

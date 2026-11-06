@@ -25,6 +25,15 @@ function link(href, text) {
   return anchor;
 }
 
+/** The name's text with a <wbr> after each hyphen, so a line breaks there and only there: a
+ * hyphen before a digit, as in accessibility-16, is otherwise no break opportunity.
+ * @param {string} name */
+function breakable(name) {
+  return name
+    .split(/(?<=-)/)
+    .flatMap((part, index) => (index === 0 ? [part] : [document.createElement("wbr"), part]));
+}
+
 /** The set's section: its heading, what it is, and its glyphs' list, each glyph its module's
  * markup beside its name.
  * @param {import("./catalog.js").CatalogSet} set
@@ -52,7 +61,7 @@ function section(set, glyphs) {
       const glyph = element("span");
       glyph.className = "glyph";
       glyph.innerHTML = glyphs[index];
-      const item = element("li", glyph, element("code", name));
+      const item = element("li", glyph, element("code", ...breakable(name)));
       item.dataset.icon = `${set.name}/${name}`;
       return item;
     }),
