@@ -1,0 +1,1 @@
+export default "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"1em\" height=\"1em\" viewBox=\"0 0 8 16\" aria-hidden=\"true\" focusable=\"false\"><path fill-rule=\"evenodd\" d=\"M5.5 3L7 4.5L3.25 8L7 11.5L5.5 13l-5-5l5-5z\" fill=\"currentColor\"/></svg>";
