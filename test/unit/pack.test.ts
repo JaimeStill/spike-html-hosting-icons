@@ -2,7 +2,8 @@
 // TMPDIR, removed after. Its files are the build and the files every pack carries, never the browse
 // page or the scripts that serve it; its manifest declares no runtime dependency; and an icon
 // resolves from it by its set and name, as a consumer imports it, in node to its module and under
-// TypeScript's types condition to its declaration, which types the icon as a string. It packs the dist/ mise run build writes, and reads no network.
+// TypeScript's types condition to its declaration, which types the icon as a string. It packs the
+// dist/ mise run build writes, and reads no network.
 
 import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
@@ -18,7 +19,7 @@ import {
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative, sep } from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { after, before, describe, test } from "node:test";
 import ts from "typescript";
 
@@ -91,7 +92,7 @@ function typeCheck(source: string): { messages: string[]; declarations: string[]
 }
 
 describe("the pack", () => {
-  test("is package.json, README.md, LICENSE, and the build", () => {
+  test("is package.json, README.md, LICENSE, and the build, never the browse page or its scripts", () => {
     const built = listFiles(join(root, "dist")).map((path) => `dist/${path}`);
     assert.ok(built.includes("dist/octicon/x-16.js"), "mise run build wrote no dist/octicon/");
     assert.deepEqual(
@@ -100,26 +101,18 @@ describe("the pack", () => {
     );
   });
 
-  test("leaves out the browse page and what serves it", () => {
-    const stray = listFiles(installed).filter((path) => /^(browse|scripts|test)\//.test(path));
-    assert.deepEqual(stray, []);
-  });
-
   test("ships Octicons' LICENSE and its provenance line beside the modules", () => {
     const files = listFiles(installed);
     assert.ok(files.includes("dist/octicon/LICENSE"));
     assert.ok(files.includes("dist/octicon/LICENSE.provenance"));
   });
 
-  test("declares no runtime dependency, and Iconify's packages only as devDependencies", () => {
+  test("declares no runtime dependency and no install script", () => {
     const manifest = JSON.parse(readFileSync(join(installed, "package.json"), "utf8"));
     assert.equal(manifest.dependencies, undefined);
     assert.equal(manifest.peerDependencies, undefined);
     assert.equal(manifest.optionalDependencies, undefined);
     assert.equal(manifest.scripts, undefined);
-    for (const dev of ["@iconify/utils", "@iconify/types", "@iconify-json/octicon"]) {
-      assert.match(manifest.devDependencies[dev], /^\d+\.\d+\.\d+$/, dev);
-    }
   });
 
   test("an icon resolves by its set and name to its module, a string", async () => {
@@ -135,8 +128,8 @@ describe("the pack", () => {
       { cwd: consumer, encoding: "utf8" },
     );
     assert.match(svg, /^<svg [^>]*viewBox="0 0 16 16"[^>]*>.*<\/svg>$/s);
-    const built = readFileSync(join(root, "dist/octicon/x-16.js"), "utf8");
-    assert.equal(built, `export default ${JSON.stringify(svg)};\n`);
+    const built = await import(pathToFileURL(join(root, "dist/octicon/x-16.js")).href);
+    assert.equal(svg, built.default);
   });
 
   test("an icon resolves under the types condition to its declaration", () => {

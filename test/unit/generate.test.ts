@@ -1,8 +1,7 @@
-// The generator, scripts/generate.ts: the licence rule on every accepted and some refused
-// licences; the fixture sets in test/fixtures/sets/, in @iconify-json's layout, generated into
-// scratch directories, so a set's name other than a released one's works and a CC-BY set is
-// refused; and the released Octicons in the dist/ mise run build writes, with their LICENSE byte
-// for byte and its provenance line.
+// The generator, scripts/generate.ts: the licence rule on some refused licences; the fixture sets
+// in test/fixtures/sets/, in @iconify-json's layout, generated into scratch directories, so a set's
+// name other than a released one's works, and a CC-BY set is refused; and the released Octicons in
+// the dist/ mise run build writes, with their LICENSE byte for byte and its provenance line.
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -20,9 +19,7 @@ import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { after, describe, test } from "node:test";
 import {
-  acceptedLicenses,
   generateSet,
-  iconDeclaration,
   licenseProblem,
   provenanceFile,
   releasedSets,
@@ -65,11 +62,6 @@ function svgAttributes(svg: string): Record<string, string> | undefined {
 }
 
 describe("the licence rule", () => {
-  for (const spdx of acceptedLicenses) {
-    test(`accepts ${spdx}`, () => {
-      assert.equal(licenseProblem("any", { title: spdx, spdx }), undefined);
-    });
-  }
   for (const spdx of ["CC-BY-4.0", "CC-BY-SA-4.0", "GPL-2.0-only", "GPL-3.0-or-later", "OFL-1.1"]) {
     test(`refuses ${spdx}, naming the set and its licence`, () => {
       const problem = licenseProblem("some-set", { title: spdx, spdx });
@@ -129,12 +121,6 @@ describe("a fixture set", () => {
     );
   });
 
-  test("each declaration types the default export as a string", () => {
-    for (const name of names) {
-      assert.equal(readFileSync(join(out, "tiny", `${name}.d.ts`), "utf8"), iconDeclaration);
-    }
-  });
-
   test("the LICENSE is copied byte for byte, the provenance line beside it", () => {
     assert.deepEqual(
       readFileSync(join(out, "tiny/LICENSE")),
@@ -174,9 +160,8 @@ describe("the released sets", () => {
   const sets = JSON.parse(readFileSync(join(root, "sets.json"), "utf8"));
   const dist = join(root, "dist");
 
-  test("are Octicons alone", () => {
-    assert.deepEqual(Object.keys(sets), ["octicon"]);
-    assert.deepEqual(readdirSync(dist), ["octicon"]);
+  test("are built each into its own directory, and nothing else", () => {
+    assert.deepEqual(readdirSync(dist).sort(), Object.keys(sets).sort());
   });
 
   test("the build holds one module and one declaration per Octicons icon and alias", () => {

@@ -114,18 +114,21 @@ const BROKEN = `${ITEMS}.flatMap((item) => {
 
 /**
  * Each glyph whose paint isn't the text's, in a page expression: an element of the glyph's svg
- * with a fill or a stroke whose computed value isn't the computed color of its list item. The
- * glyph is drawn only through currentColor, so each such value resolves to that color.
+ * with a fill or a stroke whose computed value isn't the computed color of its list item, or a
+ * glyph with no such element, which would hold nothing to compare. The glyph is drawn only through
+ * currentColor, so each such value resolves to that color.
  */
 const UNFOLLOWED = `${ITEMS}.flatMap((item) => {
   const color = getComputedStyle(item).color;
-  return [...item.querySelectorAll(".glyph svg, .glyph svg *")].flatMap((element) =>
+  const paints = [...item.querySelectorAll(".glyph svg, .glyph svg *")].flatMap((element) =>
     ["fill", "stroke"]
       .filter((property) => element.hasAttribute(property))
-      .map((property) => getComputedStyle(element)[property])
-      .filter((value) => value !== color)
-      .map((value) => item.dataset.icon + ": " + value + " against " + color),
+      .map((property) => getComputedStyle(element)[property]),
   );
+  if (paints.length === 0) return [item.dataset.icon + ": no fill or stroke to compare"];
+  return paints
+    .filter((value) => value !== color)
+    .map((value) => item.dataset.icon + ": " + value + " against " + color);
 })`;
 
 describe("the browse page", { timeout: 300_000 }, () => {

@@ -23,7 +23,7 @@ import { iconToHTML, iconToSVG, parseIconSet } from "@iconify/utils";
  * a set may carry. Any other, CC-BY's and GPL's among them, asks for more than a LICENSE beside
  * the modules (attribution where the icon is shown, or the work's own licence), so its set is
  * refused. */
-export const acceptedLicenses = [
+const acceptedLicenses = [
   "MIT",
   "ISC",
   "Apache-2.0",
@@ -97,18 +97,18 @@ const iconName = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 /** The icon as one complete svg string: its viewBox, 1em square, hidden from assistive technology
  * and out of the tab order, and drawn in currentColor, which the icon's own markup carries. */
-export function iconSvg(icon: ExtendedIconifyIcon): string {
+function iconSvg(icon: ExtendedIconifyIcon): string {
   const { attributes, body } = iconToSVG(icon, { width: "1em", height: "1em" });
   return iconToHTML(body, { ...attributes, "aria-hidden": "true", focusable: "false" });
 }
 
 /** An icon module's source: the svg string, its default export. */
-export function iconModule(svg: string): string {
+function iconModule(svg: string): string {
   return `export default ${JSON.stringify(svg)};\n`;
 }
 
 /** Every icon module's declaration: its default export is a string. */
-export const iconDeclaration = "declare const svg: string;\nexport default svg;\n";
+const iconDeclaration = "declare const svg: string;\nexport default svg;\n";
 
 /** The provenance line's file, beside the LICENSE it describes, so the LICENSE stays byte for
  * byte the upstream's. */

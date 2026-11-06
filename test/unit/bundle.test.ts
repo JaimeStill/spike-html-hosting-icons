@@ -4,23 +4,22 @@
 // no other icon the build generated. The bundle reads no network.
 
 import assert from "node:assert/strict";
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { describe, test } from "node:test";
 import { rolldown } from "rolldown";
 
 const root = join(import.meta.dirname, "../..");
 const octicons = join(root, "dist/octicon");
 
-/** Every generated Octicons module's svg string, by icon name: the JSON string literal each module
- * default-exports, parsed. */
-function generatedIcons(): Map<string, string> {
+/** Every generated Octicons module's svg string, by icon name, as node imports it. */
+async function generatedIcons(): Promise<Map<string, string>> {
   const icons = new Map<string, string>();
   for (const file of readdirSync(octicons).filter((file) => file.endsWith(".js"))) {
-    const source = readFileSync(join(octicons, file), "utf8");
-    const literal = source.match(/^export default (".*");\n$/s);
-    assert.ok(literal, `${file} isn't one default-exported string`);
-    icons.set(file.slice(0, -".js".length), JSON.parse(literal[1]));
+    const { default: svg } = await import(pathToFileURL(join(octicons, file)).href);
+    assert.equal(typeof svg, "string", `${file} default-exports a string`);
+    icons.set(file.slice(0, -".js".length), svg);
   }
   return icons;
 }
@@ -38,7 +37,7 @@ describe("a fixture build", () => {
 
     // An icon's markup is in the output when its string literal is; rolldown writes a string as
     // JSON writes it. An alias shares its parent's markup, so it is held whenever its parent is.
-    const icons = generatedIcons();
+    const icons = await generatedIcons();
     const imported = new Set([icons.get("check-16"), icons.get("x-16")]);
     const held = [...icons].filter(([, svg]) => code.includes(JSON.stringify(svg)));
     assert.deepEqual(
