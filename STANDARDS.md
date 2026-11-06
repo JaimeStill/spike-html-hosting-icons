@@ -4,7 +4,7 @@ The judgement calls the check can't enforce, one line each, for the standards-re
 `mise run check` enforces is never restated here.
 
 This repository is the icons layer of spike-html-hosting: per-icon ES modules generated from
-Iconify's sets at its build, released by tag and peered by the components and the SDK.
+Iconify's sets at its build, released by tag, which a consumer takes as a peer.
 
 The architecture pages that apply, in the architecture repository:
 

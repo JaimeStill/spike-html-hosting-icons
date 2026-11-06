@@ -6,7 +6,7 @@
 // registers, from the foundation's registry; and the page served as the browser tier serves it, by
 // scripts/served.ts. The files go to a fresh directory under TMPDIR, or to --dir's, never into the
 // repository unless --dir names its gitignored captures/.
-// Adapted from spike-html-hosting-sdk (v0.4.0): src/screenshots.ts, its states, its theme menu's
+// Adapted from spike-html-hosting-sdk (3a2a381): src/screenshots.ts, its states, its theme menu's
 // open step, its facets, --all, and registry read, on the one page.
 
 import { until } from "@jaimestill/spike-html-apps-tooling/browser.js";

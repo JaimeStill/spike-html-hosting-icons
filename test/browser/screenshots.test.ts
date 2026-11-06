@@ -4,7 +4,7 @@
 // off. It prints the page's four states' captures under that TMPDIR and leaves it empty, and with
 // --keep leaves every capture it printed, so the first run's empty TMPDIR is the output's cleanup,
 // not a capture that never wrote. Neither run writes into the repository.
-// Adapted from spike-html-hosting-sdk (v0.4.0): src/screenshots.ts, its capture, leavesNoCapture,
+// Adapted from spike-html-hosting-sdk (3a2a381): src/screenshots.ts, its capture, leavesNoCapture,
 // and keepsCaptures, on the browse page, as the layer doesn't depend on the SDK.
 
 import assert from "node:assert/strict";

@@ -4,8 +4,7 @@ The icons layer of spike-html-hosting: one icon toolkit for the spike's GitHub P
 hosted artifacts, published as `@jaimestill/spike-html-hosting-icons`. Its build generates one ES
 module per icon of an Iconify set, through [@iconify/utils](https://github.com/iconify/iconify),
 and each module default-exports the icon as one complete `svg` string, so a bundle carries only
-the icons it imports. The package has no runtime dependencies, and the components and the SDK
-take it as a peer.
+the icons it imports. The package has no runtime dependencies, and a consumer takes it as a peer.
 
 It releases [Octicons](https://github.com/primer/octicons) alone.
 
