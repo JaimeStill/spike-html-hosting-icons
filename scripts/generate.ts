@@ -13,7 +13,7 @@
 // The generator reads no network: every set is a devDependency or a fixture on disk.
 
 import { createHash } from "node:crypto";
-import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ExtendedIconifyIcon, IconifyInfo, IconifyJSON } from "@iconify/types";
@@ -149,4 +149,21 @@ export function generateSet(source: SetSource, out: string): string[] {
   copyFileSync(source.license, join(setDir, "LICENSE"));
   writeFileSync(join(setDir, provenanceFile), `${source.provenance}\n`);
   return [...modules.keys()].sort();
+}
+
+/** Generates every set into `out`, emptied first, each as generateSet does. A set it refuses, at
+ * any place in `sources`, throws its refusal and leaves `out` empty, the sets before it removed
+ * too, so a refused build holds no partial output. Returns each set's icon names, by set. */
+export function generateSets(sources: SetSource[], out: string): Map<string, string[]> {
+  const empty = () => {
+    rmSync(out, { recursive: true, force: true });
+    mkdirSync(out, { recursive: true });
+  };
+  empty();
+  try {
+    return new Map(sources.map((source) => [source.name, generateSet(source, out)]));
+  } catch (error) {
+    empty();
+    throw error;
+  }
 }

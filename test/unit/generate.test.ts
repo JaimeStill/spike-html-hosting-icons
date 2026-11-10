@@ -1,7 +1,8 @@
 // The generator, scripts/generate.ts: the licence rule on some refused licences; the fixture sets
 // in test/fixtures/sets/, in @iconify-json's layout, generated into scratch directories, so a set's
-// name other than a released one's works, and a CC-BY set is refused; and the released Octicons in
-// the dist/ mise run build writes, with their LICENSE byte for byte and its provenance line.
+// name other than a released one's works, and a CC-BY set is refused, a build of sets that holds one
+// leaving its output empty; and the released Octicons in the dist/ mise run build writes, with
+// their LICENSE byte for byte and its provenance line.
 
 import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
@@ -20,6 +21,7 @@ import { pathToFileURL } from "node:url";
 import { after, describe, test } from "node:test";
 import {
   generateSet,
+  generateSets,
   licenseProblem,
   provenanceFile,
   releasedSets,
@@ -153,6 +155,25 @@ describe("a fixture set", () => {
       () => generateSet({ ...fixture("tiny"), dir }, scratchDir()),
       /icon set tiny: dot isn't drawn in currentColor/,
     );
+  });
+});
+
+describe("a build of fixture sets", () => {
+  test("generates each set into its own directory", () => {
+    const out = scratchDir();
+    const built = generateSets([fixture("tiny")], out);
+    assert.deepEqual([...built.keys()], ["tiny"]);
+    assert.deepEqual(readdirSync(out), ["tiny"]);
+  });
+
+  test("a refused set after an accepted one leaves the output empty, naming the set and its licence", () => {
+    const out = scratchDir();
+    writeFileSync(join(out, "stale.js"), "");
+    assert.throws(
+      () => generateSets([fixture("tiny"), fixture("attrib")], out),
+      /^Error: icon set attrib is licensed CC-BY-4.0, /,
+    );
+    assert.deepEqual(readdirSync(out), []);
   });
 });
 
