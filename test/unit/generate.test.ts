@@ -1,7 +1,7 @@
 // The generator, scripts/generate.ts: the licence rule on some refused licences; the fixture sets
 // in test/fixtures/sets/, in @iconify-json's layout, generated into scratch directories, so a set's
-// name other than a released one's works, and a CC-BY set is refused, a build of sets that holds one
-// leaving its output empty; and the released Octicons in the dist/ mise run build writes, with
+// name other than a released one's works, and a CC-BY set is refused, a build of sets that holds
+// one leaving its output empty; and the released Octicons in the dist/ mise run build writes, with
 // their LICENSE byte for byte and its provenance line.
 
 import assert from "node:assert/strict";
