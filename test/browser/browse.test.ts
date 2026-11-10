@@ -8,12 +8,14 @@
 // px, with no sideways scroll, each glyph's name broken only after a hyphen and never wider than
 // its cell, the glyphs' paint the text's in each and the schemes' backgrounds
 // apart; a dark scheme the query names reaches the first load's glyphs; the page raises no error;
-// and no request the page makes leaves the local origin.
+// and no request the page makes leaves the local origin. A fixture set whose licence has an SPDX
+// identifier and no URL, served in place of the released sets, is labelled by its identifier.
 // Adapted from spike-html-hosting-components (aa9d491): test/browser/site.test.ts, its server,
 // browser, load, and profile runs.
 
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { after, before, describe, test } from "node:test";
@@ -23,7 +25,10 @@ import type { Browser, Page } from "@jaimestill/spike-html-apps-tooling/browser.
 import { serve } from "@jaimestill/spike-html-apps-tooling/server.js";
 import type { Server } from "@jaimestill/spike-html-apps-tooling/server.js";
 
-import { catalog, PAGE, root, served } from "../../scripts/served.ts";
+import type { IconifyInfo } from "@iconify/types";
+import type { CatalogSet } from "../../browse/catalog.d.ts";
+import { generateSet } from "../../scripts/generate.ts";
+import { CATALOG, catalog, PAGE, root, served } from "../../scripts/served.ts";
 
 /** The registry's names by facet, the first of each the default. */
 interface Registry {
@@ -296,5 +301,63 @@ describe("the browse page", { timeout: 300_000 }, () => {
       requests.filter((url) => !local(url)),
       [],
     );
+  });
+});
+
+describe("the browse page on a fixture set", { timeout: 60_000 }, () => {
+  const fixture = join(root, "test/fixtures/sets/tiny");
+  const out = mkdtempSync(join(tmpdir(), "browse-"));
+  const info: IconifyInfo = JSON.parse(readFileSync(join(fixture, "info.json"), "utf8"));
+  /** The tiny fixture, whose licence has an SPDX identifier and no URL, as the only set. */
+  const sets: CatalogSet[] = [
+    {
+      name: "tiny",
+      title: info.name,
+      license: { title: info.license.title, spdx: info.license.spdx, url: info.license.url },
+      upstream: { repository: "https://example.test/tiny", tag: "v0.0.0", commit: "0" },
+      icons: generateSet(
+        { name: "tiny", dir: fixture, license: join(fixture, "LICENSE"), provenance: "fixture" },
+        out,
+      ),
+    },
+  ];
+  let server: Server;
+  let browser: Browser;
+  let page: Page;
+  before(async () => {
+    server = await serve({
+      ...served,
+      // The fixture's catalog and its generated modules, in place of the released sets'.
+      handler: (request, response) => {
+        const { pathname } = new URL(request.url ?? "/", "http://localhost");
+        const module = pathname.match(/^\/dist\/tiny\/([a-z0-9-]+)\.js$/);
+        if (pathname !== CATALOG && !module) return false;
+        const body =
+          pathname === CATALOG
+            ? `export default ${JSON.stringify(sets)};\n`
+            : readFileSync(join(out, "tiny", `${module?.[1]}.js`));
+        response.writeHead(200, { "content-type": "text/javascript" }).end(body);
+        return true;
+      },
+    });
+    browser = await launch();
+    page = await browser.open("about:blank");
+  });
+  after(async () => {
+    await page?.close();
+    await browser?.close();
+    await server?.stop();
+    rmSync(out, { recursive: true, force: true });
+  });
+
+  test("labels a licence with an SPDX identifier and no URL by its identifier", async () => {
+    assert.equal(info.license.url, undefined, "the fixture's licence gives no URL");
+    assert.notEqual(info.license.spdx, info.license.title, "its identifier and title differ");
+    await page.goto(`${server.origin}${PAGE}`);
+    await page.evaluate(`window.ready`);
+    const licence: string = await page.evaluate(
+      `document.querySelector("main > section .about > dd").textContent`,
+    );
+    assert.equal(licence, info.license.spdx);
   });
 });
