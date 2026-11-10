@@ -42,13 +42,12 @@ function section(set, glyphs) {
   const heading = element("h2", `${set.title} `, element("code", set.name));
   heading.id = set.name;
   const { license, upstream } = set;
+  const label = license.spdx ?? license.title;
   const about = element(
     "dl",
     element("dt", "Licence"),
-    element(
-      "dd",
-      license.url === undefined ? license.title : link(license.url, license.spdx ?? license.title),
-    ),
+    // The licence's SPDX identifier, else its title, linked when the set gives a URL.
+    element("dd", license.url === undefined ? label : link(license.url, label)),
     element("dt", "Upstream"),
     element("dd", link(`${upstream.repository}/tree/${upstream.tag}`, upstream.tag)),
     element("dt", "Glyphs"),

@@ -44,7 +44,8 @@ the set has ever answered keeps resolving; the browse page shows them all.
 `sets.json` lists the released sets, each read from its `@iconify-json/*` devDependency. The
 generator accepts a set only when shipping its licence text satisfies the licence: MIT, ISC,
 Apache-2.0, BSD-2-Clause, BSD-3-Clause, CC0-1.0, or Unlicense. It fails the build on any other,
-CC-BY, CC-BY-SA, and GPL among them, naming the set and its licence.
+CC-BY, CC-BY-SA, and GPL among them, naming the set and its licence, and leaves `dist/` empty,
+so no accepted set built before it survives.
 
 `@iconify-json/*` ships no licence text, so each released set's upstream LICENSE is held in
 `licenses/<set>/`, byte for byte, and `sets.json` records its sha256 and the upstream repository,
